@@ -6,25 +6,25 @@ const {
   updatePerson,
   removePerson,
 } = require('./controllers/personsController');
-const { errorWrapper } = require('./utils');
+const { errorWrapper, personsRouteRegExp } = require('./utils');
 
 const server = http.createServer((req, res) => {
   errorWrapper(req, res, () => {
     if (req.url === '/persons' && req.method === 'GET') {
-      getPersons(res);
-    } else if (req.url.match(personRouteRegExp) && req.method === 'GET') {
+      return getPersons(req, res);
+    } else if (req.url.match(personsRouteRegExp) && req.method === 'GET') {
       const id = req.url.split('/')[2];
-      findByIdPerson(res, id);
+      return findByIdPerson(req, res, id);
     } else if (req.url === '/persons' && req.method === 'POST') {
-      createPerson(req, res);
-    } else if (req.url.match(personRouteRegExp) && req.method === 'PUT') {
+      return createPerson(req, res);
+    } else if (req.url.match(personsRouteRegExp) && req.method === 'PUT') {
       const id = req.url.split('/')[2];
 
-      updatePerson(req, res, id);
-    } else if (req.url.match(personRouteRegExp) && req.method === 'DELETE') {
+      return updatePerson(req, res, id);
+    } else if (req.url.match(personsRouteRegExp) && req.method === 'DELETE') {
       const id = req.url.split('/')[2];
 
-      removePerson(req, res, id);
+      return removePerson(req, res, id);
     } else {
       res.writeHead(404);
       res.end('The route doesn`t exist');

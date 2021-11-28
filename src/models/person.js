@@ -1,10 +1,6 @@
 const { v4: uuid } = require('uuid');
 
-const person1 = { id: '1', name: 'John', age: 23, hobbies: ['games', 'football'] };
-const person2 = { id: '2', name: 'Masha', age: 9, hobbies: ['games', 'dances'] };
-const person3 = { id: '3', name: 'Nika', age: 2, hobbies: ['eat', 'sleep'] };
-
-let persons = [person1, person2, person3];
+let persons = [];
 
 const findAll = () => new Promise((res, rej) => res(persons));
 
@@ -30,7 +26,7 @@ const update = (person, id) =>
     const index = persons.findIndex((p) => p.id === id);
     persons[index] = { id, ...person };
 
-    res(person[index]);
+    res(persons[index]);
   });
 
 const remove = (id) =>

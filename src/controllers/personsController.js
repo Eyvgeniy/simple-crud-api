@@ -1,30 +1,22 @@
 const Person = require('../models/person');
 const { getBody, uuidRegExp, sendWrongRequest } = require('../utils');
 
-const getPersons = async (res) => {
-  try {
-    const persons = await Person.findAll();
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(persons));
-  } catch (error) {
-    console.error(error);
-  }
+const getPersons = async (req, res) => {
+  const persons = await Person.findAll();
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(persons));
 };
 
-const findByIdPerson = async (res, id) => {
-  try {
-    if (!id.match(uuidRegExp)) return sendWrongRequest(res, 'Wrong id');
+const findByIdPerson = async (req, res, id) => {
+  if (!id.match(uuidRegExp)) return sendWrongRequest(res, 'Wrong id');
 
-    const person = await Person.findById(id);
-    if (person === undefined) {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ message: 'Person not found' }));
-    } else {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(person));
-    }
-  } catch (error) {
-    console.error(error);
+  const person = await Person.findById(id);
+  if (person === undefined) {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Person not found' }));
+  } else {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(person));
   }
 };
 
@@ -43,50 +35,43 @@ const createPerson = async (req, res) => {
   res.end(JSON.stringify(newPerson));
 };
 
-const updatePerson = async (res, req, id) => {
-  try {
-    if (!id.match(uuidRegExp)) return sendWrongRequest(res, 'Wrong id');
+const updatePerson = async (req, res, id) => {
+  if (!id.match(uuidRegExp)) return sendWrongRequest(res, 'Wrong id');
 
-    const person = Person.findById(id);
+  const person = await Person.findById(id);
 
-    if (person === undefined) {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ message: 'Person not found' }));
-    }
-
-    const body = await getBody(req);
-    const { name, age, hobbies } = JSON.parse(body);
-    const personData = {
-      name: name || personData.name,
-      age: age || personData.age,
-      hobbies: hobbies || personData.hobbies,
-    };
-    const newPerson = await Person.update(id, personData);
-
-    res.writeHead(201, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(newPerson));
-  } catch (error) {
-    console.error(error);
+  if (person === undefined) {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Person not found' }));
+    return;
   }
+
+  const body = await getBody(req);
+  const { name, age, hobbies } = JSON.parse(body);
+  const personData = {
+    name: name || personData.name,
+    age: age || personData.age,
+    hobbies: hobbies || personData.hobbies,
+  };
+  const newPerson = await Person.update(personData, id);
+
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(newPerson));
 };
 
 const removePerson = async (req, res, id) => {
-  try {
-    if (!id.match(uuidRegExp)) return sendWrongRequest(res, 'Wrong id');
+  if (!id.match(uuidRegExp)) return sendWrongRequest(res, 'Wrong id');
 
-    const person = await Person.findById(id);
+  const person = await Person.findById(id);
 
-    if (person === undefined) {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ message: 'Person not found' }));
-    } else {
-      await Person.remove(id);
+  if (person === undefined) {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Person not found' }));
+  } else {
+    await Person.remove(id);
 
-      res.writeHead(204);
-      res.end();
-    }
-  } catch (error) {
-    console.error(error);
+    res.writeHead(204);
+    res.end();
   }
 };
 
