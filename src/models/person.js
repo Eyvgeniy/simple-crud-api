@@ -17,10 +17,12 @@ const findById = (id) =>
 
 const create = (person) =>
   new Promise((res, rej) => {
+    const errors = validateParams(person);
+
     const newPerson = { id: uuid(), ...person };
     persons.push(newPerson);
 
-    res(newPerson);
+    res([errors, newPerson]);
   });
 
 const update = (person, id) =>
@@ -37,6 +39,29 @@ const remove = (id) =>
 
     res();
   });
+
+const validateParams = (params) => {
+  const errors = [];
+  const { name, age, hobbies } = params;
+
+  if (typeof name !== 'string') {
+    errors.push('Name is required and should be string');
+  }
+  if (typeof age !== 'string') {
+    errors.push('Age is required  and should be string');
+  }
+
+  if (!Array.isArray(hobbies)) {
+    errors.push('Hobbies should be array');
+  } else {
+    hobbies.forEach((hobby) => {
+      if (typeof hobby !== 'string') {
+        errors.push('Hobby should be string');
+      }
+    });
+  }
+  return errors;
+};
 
 module.exports = {
   findAll,

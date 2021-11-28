@@ -29,17 +29,18 @@ const findByIdPerson = async (res, id) => {
 };
 
 const createPerson = async (req, res) => {
-  try {
-    const body = await getBody(req);
-    const { name, age, hobbies } = JSON.parse(body);
-    const personData = { name, age, hobbies };
-    const newPerson = await Person.create(personData);
+  const body = await getBody(req);
+  const { name, age, hobbies } = JSON.parse(body);
+  const personData = { name, age, hobbies };
+  const [errors, newPerson] = await Person.create(personData);
 
-    res.writeHead(201, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(newPerson));
-  } catch (error) {
-    console.error(error);
+  if (errors.length > 0) {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ message: errors[0] }));
   }
+
+  res.writeHead(201, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(newPerson));
 };
 
 const updatePerson = async (res, req, id) => {
